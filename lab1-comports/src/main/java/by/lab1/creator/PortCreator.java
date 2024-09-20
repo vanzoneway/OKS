@@ -2,7 +2,6 @@ package by.lab1.creator;
 
 import by.lab1.event.PortReader;
 import by.lab1.model.PortWithTextArea;
-import by.lab1.model.Speed;
 import javafx.scene.control.TextArea;
 import jssc.SerialPort;
 import jssc.SerialPortException;
@@ -27,17 +26,17 @@ public class PortCreator {
         }
     }
 
-    public static void setParams(List<PortWithTextArea> ports, Speed speed) {
+    public static void setParams(List<PortWithTextArea> ports) {
         for (PortWithTextArea port : ports) {
             try {
                 port.getSerialPort().setParams(
-                        speed.getBaudRate(),
+                        SerialPort.BAUDRATE_9600,
                         SerialPort.DATABITS_8,
                         SerialPort.STOPBITS_1,
                         SerialPort.PARITY_NONE
                 );
             } catch (SerialPortException e) {
-                e.printStackTrace();
+                logger.appendText("Error to set params in COM port ... ERROR");
             }
         }
     }

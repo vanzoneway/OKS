@@ -4,16 +4,20 @@ package by.lab1.controller;
 import by.lab1.creator.PortCreator;
 import by.lab1.event.SendEvent;
 import by.lab1.model.PortWithTextArea;
-import by.lab1.model.Speed;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.input.KeyCode;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 
 import java.util.Arrays;
+import java.util.Objects;
+
 
 
 public class StarterController {
@@ -31,7 +35,10 @@ public class StarterController {
     private TextArea logger;
 
     @FXML
-    private ComboBox<String> speed;
+    private Button reset;
+
+    @FXML
+    private Label counter;
 
     @FXML
     private ComboBox<String> comSenderComboBox;
@@ -45,12 +52,7 @@ public class StarterController {
     @FXML
     void initialize() {
         setDisable();
-
-        for (Speed var : Speed.values())
-            speed.getItems().add(String.valueOf(var));
-
-
-        speed.setValue("BAUDRATE_9600");
+        output.setEditable(false);
 
         String[] portNames = SerialPortList.getPortNames();
         Arrays.sort(portNames);
@@ -60,41 +62,58 @@ public class StarterController {
         }
 
 
-        input.setOnKeyPressed(keyEvent -> {
-            if (keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
-                input.appendText("\n");
-            } else if (keyEvent.getCode() == KeyCode.ENTER) {
+        input.setOnKeyPressed(event -> {
+            input.positionCaret(input.getText().length());
+        });
 
-                new SendEvent(input, logger, writer).mouseClickedEvent();
+        input.setOnKeyTyped(keyEvent -> {
+
+            new SendEvent(input, logger, writer, counter).mouseClickedEvent();
+        });
+
+        output.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                output.clear();
+            }
+        });
+        input.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                input.clear();
             }
         });
 
-        output.setOnKeyPressed(keyEvent -> {
-            if (keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
-                output.appendText("\n");
-            } else if (keyEvent.getCode() == KeyCode.ENTER) {
-                new SendEvent(output, logger, receiver).mouseClickedEvent();
+
+        reset.setOnAction(event -> {
+            output.clear();
+            input.clear();
+            counter.setText("0");
+            try {
+                closeCurrentPortIfOpenedOrNull(writer);
+                closeCurrentPortIfOpenedOrNull(receiver);
+                setDisable();
+                comSenderComboBox.setValue("");
+                comReceiverComboBox.setValue("");
+            } catch (SerialPortException e) {
+                logger.appendText("Error to reset COM-ports ... ERROR");
             }
         });
-
-
-        speed.setOnAction(
-                actionEvent -> PortCreator.setParams(
-                        Arrays.asList(writer, receiver),
-                        Speed.valueOf(speed.getValue()))
-        );
 
         configButton.setOnAction(actionEvent -> {
-            if (comSenderComboBox.getValue().equals(comReceiverComboBox.getValue())) {
-                logger.appendText("Similar names of COM ports ... FAIL\n");
+            if (Objects.equals(comSenderComboBox.getValue(), comReceiverComboBox.getValue())) {
+                displayErrorPopup("Error", "Similar names of COM ports ... FAIL");
                 setDisable();
             } else if (comSenderComboBox == null && comReceiverComboBox == null) {
-                logger.appendText("Choose COM ports! ... FAIL\n");
+                displayErrorPopup("Error", "Choose COM ports! ... FAIL\n");
             } else {
                 setAvailable();
                 try {
+
+                    output.clear();
+                    input.clear();
+                    counter.setText("0");
                     closeCurrentPortIfOpenedOrNull(writer);
                     closeCurrentPortIfOpenedOrNull(receiver);
+
 
                     writer = new PortWithTextArea(PortCreator.createSerialPort(comSenderComboBox.getValue()), input);
                     logger.appendText(writer.getPortName() + " opened successfully ... SUCCESS\n");
@@ -102,17 +121,16 @@ public class StarterController {
                     receiver = new PortWithTextArea(PortCreator.createSerialPort(comReceiverComboBox.getValue()), output);
                     logger.appendText(receiver.getPortName() + " opened successfully ... SUCCESS\n");
 
+
                     PortCreator.setLogger(logger);
                     PortCreator.setEventListener(receiver);
-                    PortCreator.setEventListener(writer);
 
                     PortCreator.setParams(
-                            Arrays.asList(writer, receiver),
-                            Speed.valueOf(speed.getValue())
+                            Arrays.asList(writer, receiver)
                     );
 
                 } catch (SerialPortException e) {
-                    logger.appendText("Unable to open COM Port. It may already be in use... ERROR\n");
+                    displayErrorPopup("Error", "Unable to open COM Port. It may already be in use... ERROR\n");
                     setDisable();
                 }
 
@@ -123,21 +141,43 @@ public class StarterController {
     }
 
     public void setDisable() {
-        speed.setDisable(true);
-        output.setDisable(true);
         input.setDisable(true);
     }
 
     public void setAvailable() {
-        speed.setDisable(false);
-        output.setDisable(false);
         input.setDisable(false);
     }
+
 
     private void closeCurrentPortIfOpenedOrNull(PortWithTextArea port) throws SerialPortException {
         if (port != null)
             if (port.getSerialPort().isOpened())
                 port.getSerialPort().closePort();
+    }
+
+    private void displayErrorPopup(String title, String message) {
+        Stage popupStage = new Stage();
+
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.setTitle(title);
+        popupStage.setWidth(300);
+        popupStage.setHeight(150);
+
+        Label label = new Label(message);
+        Button closeButton = new Button("Close");
+        closeButton.setOnAction(e -> popupStage.close());
+
+        HBox buttonLayout = new HBox(10);
+        buttonLayout.getChildren().add(closeButton);
+        buttonLayout.setAlignment(Pos.CENTER);
+
+        VBox layout = new VBox(10);
+        layout.getChildren().addAll(label, buttonLayout);
+        layout.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(layout);
+        popupStage.setScene(scene);
+        popupStage.showAndWait();
     }
 
 

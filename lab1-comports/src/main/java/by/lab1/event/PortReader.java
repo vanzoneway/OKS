@@ -8,6 +8,7 @@ import jssc.SerialPortException;
 
 import java.nio.charset.StandardCharsets;
 
+
 public class PortReader implements SerialPortEventListener {
     private final PortWithTextArea port;
     private final TextArea output;
@@ -25,9 +26,13 @@ public class PortReader implements SerialPortEventListener {
         if (serialPortEvent.isRXCHAR() && serialPortEvent.getEventValue() > 0) {
             try {
                 byte[] dataByteFormat = port.getSerialPort().readBytes(serialPortEvent.getEventValue());
-                String outputData = new String(dataByteFormat, StandardCharsets.UTF_8);
-                logger.appendText("[" + outputData.length() + "]" + " bytes received" + "\n");
-                output.appendText(outputData + "\n");
+
+                String receivedData = new String(dataByteFormat, StandardCharsets.UTF_8);
+
+                if (!receivedData.isEmpty()) {
+                    char lastChar = receivedData.charAt(receivedData.length() - 1);
+                    output.appendText(String.valueOf(lastChar));
+                }
             } catch (SerialPortException e) {
                 e.printStackTrace();
             }

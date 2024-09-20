@@ -155,6 +155,7 @@ public class PacketUtils {
                         FCS: %d
                         ------------------------------------------------
                         -------------------------------------------------------------------------------
+                    
                         """,
                 PacketUtils.hexDisplayOfPacketAsString(packetBeforeStuffing),
                 PacketUtils.hexDisplayOfPacketAsString(packet),

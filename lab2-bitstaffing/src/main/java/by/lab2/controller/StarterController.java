@@ -59,6 +59,13 @@ public class StarterController {
             comReceiverComboBox.getItems().add(portName);
         }
 
+        output.setOnKeyPressed( keyEvent -> {
+            if (keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.DELETE) {
+                output.clear();
+            }
+        });
+
+
 
         input.setOnKeyPressed(keyEvent -> {
             if (keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.ENTER) {
@@ -97,10 +104,11 @@ public class StarterController {
                     closeCurrentPortIfOpenedOrNull(receiver);
 
                     writer = new PortWithTextArea(PortCreator.createSerialPort(comSenderComboBox.getValue()), input);
-                    logger.appendText(writer.getPortName() + " opened successfully ... SUCCESS\n");
+                    logger.appendText("\n" + writer.getPortName() + " opened successfully ... SUCCESS\n");
 
                     receiver = new PortWithTextArea(PortCreator.createSerialPort(comReceiverComboBox.getValue()), output);
-                    logger.appendText(receiver.getPortName() + " opened successfully ... SUCCESS\n");
+                    logger.appendText("\n" + receiver.getPortName() + " opened successfully ... SUCCESS\n");
+                    output.clear();
 
                     PortCreator.setLogger(logger);
                     PortCreator.setEventListener(receiver);
