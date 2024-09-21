@@ -4,9 +4,11 @@ package by.lab1.controller;
 import by.lab1.creator.PortCreator;
 import by.lab1.event.SendEvent;
 import by.lab1.model.PortWithTextArea;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -22,6 +24,8 @@ import jssc.SerialPortList;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+
 
 
 public class StarterController {
@@ -63,6 +67,7 @@ public class StarterController {
 
         prepareSenderAndReceiverComboBoxes();
         prepareInputTextArea();
+
 
 
         output.setOnMouseClicked(event -> {
@@ -153,7 +158,7 @@ public class StarterController {
                         displayErrorPopup("Error", """
                                 Unable to open COM-ports.
                                 One of them used in other application!
-                                """);
+                                """, input.getParent().getParent());
 
                     }
 
@@ -161,6 +166,7 @@ public class StarterController {
 
                 input.requestFocus();
                 flag = false;
+                startCtsMonitoring();
             }
             isClearing = false;
         });
@@ -239,7 +245,7 @@ public class StarterController {
                         displayErrorPopup("Error", """
                                 Unable to open COM-ports.
                                 One of them used in other application!
-                                """);
+                                """,  input.getParent().getParent());
 
                         flag = false;
                     }
@@ -352,7 +358,7 @@ public class StarterController {
 
     }
 
-    private void displayErrorPopup(String title, String message) {
+    private void displayErrorPopup(String title, String message, Node owner) {
         Stage popupStage = new Stage();
 
         popupStage.initModality(Modality.APPLICATION_MODAL);
@@ -361,30 +367,27 @@ public class StarterController {
         popupStage.setHeight(200);
         popupStage.setResizable(false);
 
-
         Label label = new Label(message);
         label.setFont(Font.font("System", 14));
-        label.setWrapText(true); // Перенос текста
+        label.setWrapText(true); // Enable text wrapping
 
         Button closeButton = new Button("Close");
         closeButton.setOnAction(e -> popupStage.close());
-        closeButton.setStyle("-fx-background-color: #e59cf5; -fx-text-fill: white;"); // Красивый цвет кнопки
+        closeButton.setStyle("-fx-background-color: #e59cf5; -fx-text-fill: white;"); // Custom button style
 
-        HBox buttonLayout = new HBox(10);
-        buttonLayout.getChildren().add(closeButton);
-        buttonLayout.setAlignment(Pos.CENTER);
-
-        VBox layout = new VBox(15);
-        layout.getChildren().addAll(label, buttonLayout);
+        VBox layout = new VBox(15, label, closeButton);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
 
         Scene scene = new Scene(layout);
         popupStage.setScene(scene);
 
+        // Center the popup relative to the owner node
+        popupStage.initOwner(owner.getScene().getWindow());
         popupStage.setOnShown(e -> {
-            popupStage.setX((Screen.getPrimary().getVisualBounds().getWidth() - popupStage.getWidth()) / 2);
-            popupStage.setY((Screen.getPrimary().getVisualBounds().getHeight() - popupStage.getHeight()) / 2);
+            Stage ownerStage = (Stage) owner.getScene().getWindow();
+            popupStage.setX(ownerStage.getX() + (ownerStage.getWidth() - popupStage.getWidth()) / 2);
+            popupStage.setY(ownerStage.getY() + (ownerStage.getHeight() - popupStage.getHeight()) / 2);
         });
 
         popupStage.showAndWait();
@@ -400,6 +403,40 @@ public class StarterController {
         }
 
         return -1;
+    }
+
+
+    public void startCtsMonitoring() {
+        Thread ctsMonitorThread = new Thread(() -> {
+            try {
+                if (writer != null && writer.getSerialPort() != null) {
+                    if(!writer.getSerialPort().isCTS()) {
+                        Platform.runLater(() ->
+                                displayErrorPopup("Warning", "You need to turn on the receiver at the other station.",
+                                        input.getParent().getParent()));
+                    }
+                }
+                while (writer != null && writer.getSerialPort() != null) {
+
+                    if (!writer.getSerialPort().isCTS()) {
+
+                        Platform.runLater(() -> input.setDisable(true));
+                    } else {
+
+                        Platform.runLater(() -> input.setDisable(false));
+                    }
+
+                    Thread.sleep(500);
+                }
+            } catch (InterruptedException e) {
+
+            } catch (SerialPortException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        ctsMonitorThread.setDaemon(true);
+        ctsMonitorThread.start();
     }
 
 
