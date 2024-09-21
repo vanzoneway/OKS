@@ -9,7 +9,7 @@ import jssc.SerialPortException;
 import java.nio.charset.StandardCharsets;
 
 
-public class PortReader implements SerialPortEventListener {
+public class  PortReader implements SerialPortEventListener {
     private final PortWithTextArea port;
     private final TextArea output;
     private final TextArea logger;

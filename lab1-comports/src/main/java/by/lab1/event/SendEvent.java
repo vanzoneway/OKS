@@ -3,8 +3,6 @@ package by.lab1.event;
 import by.lab1.model.PortWithTextArea;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.Pane;
-import javafx.scene.text.Text;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 
@@ -25,23 +23,25 @@ public class SendEvent {
         this.counter = counter;
     }
 
-    public void mouseClickedEvent() {
+    public void sendEvent() {
         try {
             if (isPortAvailable()) {
 
                 String text = input.getText();
                 if (text.length() > port.getOldTextFromTextArea().length()) {
-                    String lastCharString = text.substring(text.length() - 1); // Получаем последний символ как строку
-                    byte[] lastCharBytes = lastCharString.getBytes(StandardCharsets.UTF_8); // Преобразуем в байты
+                    String lastCharString = text.substring(text.length() - 1);
+                    byte[] lastCharBytes = lastCharString.getBytes(StandardCharsets.UTF_8);
 
-                    port.getSerialPort().writeBytes(lastCharBytes);
 
-                    port.addBytes(lastCharBytes.length);
+                    if(port.getSerialPort().isCTS()) {
+                        port.getSerialPort().writeBytes(lastCharBytes);
+                        port.addBytes(lastCharBytes.length);
 
-                    counter.setText(String.valueOf(port.getSendBytes()));
-                    port.setOldTextFromTextArea(text);
-                } else {
-                    port.setOldTextFromTextArea(text);
+                        counter.setText(String.valueOf(port.getSendBytes()));
+                        port.setOldTextFromTextArea(text);
+                    }
+
+
                 }
 
 
