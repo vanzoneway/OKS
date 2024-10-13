@@ -73,8 +73,9 @@
                         <Font size="14.0" />
                      </font>
                   </Label>
-               </children></Pane>
-            <Text disable="true" layoutX="15.0" layoutY="183.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Status" textAlignment="CENTER" wrappingWidth="223.60940551757812">
+               </children>
+            </Pane>
+            <Text disable="true" layoutX="15.0" layoutY="184.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Status" textAlignment="CENTER" wrappingWidth="223.60940551757812">
                <font>
                   <Font size="18.0" />
                </font>

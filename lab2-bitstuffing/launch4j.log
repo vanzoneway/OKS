@@ -1,0 +1,20 @@
+
+
+Version:	3.50
+CmdLine:	D:\OKS\lab2-bitstuffing\Comports-2.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	D:\OKS\lab2-bitstuffing\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+Substitute:	JAVA_HOME = C:\Users\User\.jdks\corretto-21.0.4
+Substitute:	PATH = C:\Program Files\Microsoft\jdk-21.0.4.7-hotspot\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;d:\quartus\bin;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Program Files\JetBrains\CLion 2024.2.1\bin;;D:\IntelliJ IDEA 2024.2.1\bin;;C:\Users\User\.jdks\corretto-21.0.4\bin;;C:\Users\User\.jdks\corretto-21.0.4\bin
+JRE paths:	C:\Users\User\.jdks\corretto-21.0.4;C:\Program Files\Microsoft\jdk-21.0.4.7-hotspot\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;d:\quartus\bin;C:\Users\User\AppData\Local\Microsoft\WindowsApps;C:\Program Files\JetBrains\CLion 2024.2.1\bin;;D:\IntelliJ IDEA 2024.2.1\bin;;C:\Users\User\.jdks\corretto-21.0.4\bin;;C:\Users\User\.jdks\corretto-21.0.4\bin
+Check launcher:	C:\Users\User\.jdks\corretto-21.0.4\bin\javaw.exe (OK)
+Version string: 1.021.000_004 / 64-Bit (OK)
+Launcher:	C:\Users\User\.jdks\corretto-21.0.4\bin\javaw.exe
+Launcher args:	-jar "D:\OKS\lab2-bitstuffing\Comports-2.exe"
+Args length:	45/32768 chars
+Exit code:	0

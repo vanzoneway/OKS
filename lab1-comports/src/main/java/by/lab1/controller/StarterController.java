@@ -70,11 +70,11 @@ public class StarterController {
 
 
 
-        output.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                output.clear();
-            }
-        });
+//        output.setOnMouseClicked(event -> {
+//            if (event.getClickCount() == 2) {
+//                output.clear();
+//            }
+//        });
 
 
         comSenderComboBox.setOnAction(event -> {
@@ -155,6 +155,7 @@ public class StarterController {
                             PortCreator.setParams(Collections.singletonList(writer));
 
                         }
+
                         displayErrorPopup("Error", """
                                 Unable to open COM-ports.
                                 One of them used in other application!
@@ -231,7 +232,7 @@ public class StarterController {
 
                     } catch (SerialPortException e) {
 
-                        comSenderComboBox.setValue(previousReceiverValue);
+                        comReceiverComboBox.setValue(previousReceiverValue);
 
                         if(previousReceiverValue != null && !previousReceiverValue.equals("-")) {
                             try {
@@ -274,13 +275,13 @@ public class StarterController {
 
 
 
-        input.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                isClearing = true;
-                input.clear();
-                isClearing = false;
-            }
-        });
+//        input.setOnMouseClicked(event -> {
+//            if (event.getClickCount() == 2) {
+//                isClearing = true;
+//                input.clear();
+//                isClearing = false;
+//            }
+//        });
 
 
         TextFormatter<String> inputFormatter = new TextFormatter<>(
