@@ -8,68 +8,69 @@ import java.util.Random;
 
 public class HammingCodeUtil {
 
-    public static String encodeHamming(String data) {
-        StringBuilder cleanedInput = new StringBuilder();
-        List<Integer> newlinePositions = new ArrayList<>();
-        // Clean String from \n and remember it positions
-        cleanStringFromEnter(data, cleanedInput, newlinePositions);
-        data = cleanedInput.toString();
+    public static String encodeHamming(String packet) {
+
+        StringBuilder FCS = new StringBuilder();
+
+        final int FLAG_LENGTH = 8;
+        final int DESTINATION_ADDRESS_LENGTH = 4;
+        final int SOURCE_ADDRESS_LENGTH = 4;
+
+
+        String data = packet.substring(
+                FLAG_LENGTH + DESTINATION_ADDRESS_LENGTH + SOURCE_ADDRESS_LENGTH
+        );
+
         int m = data.length();
         int r = 0;
+
         // Count amount of control bits
         while ((1 << r) < (m + r + 1)) {
             r++;
         }
-        // Create array for coding with Hamming string
-        char[] hammingCode = new char[m + r];
-        // Fill the array and inserting control bits
-        int j = 0, k = 0;
-        for (int i = 0; i < hammingCode.length; i++) {
-            // Если позиция - степень двойки, вставляем контрольный бит
-            if (isPowerOfTwo(i + 1)) {
-                hammingCode[i] = 'X'; // Место для контрольного бита
-            } else {
-                hammingCode[i] = data.charAt(k++);
-            }
-        }
+
         // Вычисляем контрольные биты
         for (int i = 0; i < r; i++) {
             int parityIndex = (1 << i);
             int parityValue = 0;
-            for (int x = 1; x <= hammingCode.length; x++) {
+            for (int x = 1; x <= data.length(); x++) {
                 if ((x & parityIndex) == parityIndex) {
-                    parityValue ^= hammingCode[x - 1] == '1' ? 1 : 0;
+                    parityValue ^= data.charAt(x - 1) == '1' ? 1 : 0;
                 }
             }
-
-            hammingCode[parityIndex - 1] = (parityValue == 1) ? '1' : '0';
+            FCS.append(parityValue);
         }
-        StringBuilder finalCode = new StringBuilder(new String(hammingCode));
-        for (int pos : newlinePositions) {
-            finalCode.insert(pos, '\n');
-        }
-        return finalCode.toString();
+        return packet + FCS;
     }
 
-    public static DecodedStringDto decodeHamming(String data, TextArea logger) {
-        StringBuilder cleanedInput = new StringBuilder();
-        List<Integer> newlinePositions = new ArrayList<>();
+    public static String decodeHamming(String packet, TextArea logger) {
+
+        final int FLAG_LENGTH = 8;
+        final int DESTINATION_ADDRESS_LENGTH = 4;
+        final int SOURCE_ADDRESS_LENGTH = 4;
+
+
+        String data = packet.substring(
+                FLAG_LENGTH + DESTINATION_ADDRESS_LENGTH + SOURCE_ADDRESS_LENGTH,
+                packet.length() - 4);
+
+        String FCS = packet.substring(packet.length() - 4);
+
 
         logger.appendText("\nReceived data from packet: ");
         logger.appendText(data.replace("\n", "\\n"));
         // Очищаем строку, оставляя только 1 и 0, и запоминаем позиции \n
-        cleanStringFromEnter(data, cleanedInput, newlinePositions);
-        data = cleanedInput.toString();
+
+        data = data;
         int r = 0;
         int m = data.length();
-        // Определяем количество контрольных битов
         while ((1 << r) < m) {
             r++;
         }
         int errorPosition = 0;
 
         // Проверяем контрольные биты
-        for (int i = 0; i < r; i++)  {
+        for (int i = 0; i < r; i++) {
             int parityIndex = (1 << i);
             int parityValue = 0;
             for (int x = 1; x <= m; x++) {
@@ -77,6 +78,7 @@ public class HammingCodeUtil {
                     parityValue ^= data.charAt(x - 1) == '1' ? 1 : 0;
                 }
             }
+            parityValue ^= FCS.charAt(i) - '0';
             if (parityValue != 0) {
                 errorPosition += parityIndex;
             }
@@ -84,24 +86,15 @@ public class HammingCodeUtil {
 
         // Если есть ошибка, исправляем
         if (errorPosition != 0) {
-            logger.appendText("\nError in position: " + errorPosition);
+            logger.appendText("\nError at index: " + (errorPosition - 1));
             char[] codeArray = data.toCharArray();
             codeArray[errorPosition - 1] = (codeArray[errorPosition - 1] == '1') ? '0' : '1'; // Исправляем ошибку
             data = new String(codeArray);
         }
-        // Извлекаем данные (исключая контрольные биты)
-        StringBuilder decodedData = new StringBuilder();
-        for (int i = 0; i < m; i++) {
-            if (!isPowerOfTwo(i + 1)) {
-                decodedData.append(data.charAt(i));
-            }
-        }
-        // Вставляем символы \n в исходные позиции
-        for (int pos : newlinePositions) {
-            decodedData.insert(pos, '\n');
-        }
 
-        return new DecodedStringDto(decodedData.toString(), errorPosition);
+
+        return packet.substring(0, FLAG_LENGTH + DESTINATION_ADDRESS_LENGTH + SOURCE_ADDRESS_LENGTH) + data + FCS;
+
     }
 
 
@@ -109,7 +102,7 @@ public class HammingCodeUtil {
         Random random = new Random();
         // Генерируем случайное число от 0 до 1
         if (random.nextDouble() < probability) {
-            StringBuilder result = new StringBuilder(input);
+            StringBuilder result = new StringBuilder(input.substring(16, input.length()-4));
             int indexToModify = random.nextInt(result.length()); // Выбираем случайный индекс
 
             char c = result.charAt(indexToModify);
@@ -118,7 +111,7 @@ public class HammingCodeUtil {
                 // Меняем '0' на '1' или '1' на '0'
                 result.setCharAt(indexToModify, (c == '0') ? '1' : '0');
             }
-            return result.toString();
+            return input.substring(0, 16) + result + input.substring(input.length() - 4);
         }
         // Если вероятность не сработала, возвращаем исходную строку
         return input;
@@ -133,9 +126,7 @@ public class HammingCodeUtil {
 
         while (i <= length) {
             // Извлекаем контрольный бит из позиции 2^(k-1)
-            if (i <= length) {
-                controlBits.append(hammingCode.charAt(i - 1));
-            }
+            controlBits.append(hammingCode.charAt(i - 1));
             i *= 2;
         }
 

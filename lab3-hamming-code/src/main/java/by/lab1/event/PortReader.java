@@ -31,11 +31,10 @@ public class  PortReader implements SerialPortEventListener {
                 byte[] dataByteFormat = port.getSerialPort().readBytes(serialPortEvent.getEventValue());
 
                 String receivedData = new String(dataByteFormat, StandardCharsets.UTF_8);
-                String encodedData = BitStuffingUtil.extractDataFromPacket(BitStuffingUtil.deBitStuffing(receivedData));
-                encodedData = HammingCodeUtil.modifyStringWithProbability(encodedData, 0.3);
-                DecodedStringDto decodedData = HammingCodeUtil.decodeHamming(encodedData, logger);
-                if (!receivedData.isEmpty()) {
-                    output.appendText(decodedData.decodedString());
+                String decodedHamming = HammingCodeUtil.
+                decodeHamming(HammingCodeUtil.modifyStringWithProbability(BitStuffingUtil.deBitStuffing(receivedData), 0.3), logger);
+             if (!receivedData.isEmpty()) {
+                    output.appendText(BitStuffingUtil.extractDataFromPacket(decodedHamming));
                 }
             } catch (SerialPortException e) {
                 e.printStackTrace();

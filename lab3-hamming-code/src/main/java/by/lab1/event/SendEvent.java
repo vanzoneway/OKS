@@ -38,13 +38,13 @@ public class SendEvent {
                 String text = input.getText();
                 String dataText = text.substring(text.length() - 11);
                 if (dataText.length() == 11) {
-                    String hammingDataText = HammingCodeUtil.encodeHamming(dataText);
                     if (port.getSerialPort().isCTS()) {
-                        String packet = BitStuffingUtil.createPacket(hammingDataText, port.getPortName());
-                        String packetAfterBitStuffing = BitStuffingUtil.bitStuffing(packet);
+                        String packet = BitStuffingUtil.createPacket(dataText, port.getPortName());
+                        String hammingCodePacket = HammingCodeUtil.encodeHamming(packet);
+                        String packetAfterBitStuffing = BitStuffingUtil.bitStuffing(hammingCodePacket);
                         addPacketString(packetAfterBitStuffing.replace("\n", "\\n"));
                         port.getSerialPort().writeBytes(packetAfterBitStuffing.getBytes(StandardCharsets.UTF_8));
-                        port.addBytes(hammingDataText.length());
+                        port.addBytes(hammingCodePacket.length());
 
                         counter.setText(String.valueOf(port.getSendBytes()));
                         port.setOldTextFromTextArea(text);
@@ -64,6 +64,9 @@ public class SendEvent {
 
     private void addPacketString(String packet) {
 
+        StringBuilder stringBuilder = new StringBuilder(packet);
+        stringBuilder.insert(packet.length() - 4, ' ');
+        packet = stringBuilder.toString();
         TextFlow textFlow = new TextFlow();
 
         int startIndex = 0;

@@ -8,7 +8,7 @@ public class BitStuffingUtil {
 
     public static String createPacket(String data,String comPortName) {
         String SOURCE_ADDRESS = toBinaryString(extractNumber(comPortName));
-        return FLAG + DESTINATION_ADDRESS + SOURCE_ADDRESS + data + HammingCodeUtil.extractControlBits(data);
+        return FLAG + DESTINATION_ADDRESS + SOURCE_ADDRESS + data;
     }
 
     public static String bitStuffing(String data) {
@@ -53,7 +53,7 @@ public class BitStuffingUtil {
         return unstuffedData.toString();
     }
 
-
+    // <-- изменяем packet.length() - 4, так FCS поле для моего варианта по итогу будет занимать 4 бита -->
     public static String extractDataFromPacket(String packet) {
         return packet.substring(16, packet.length() - 4);
     }
