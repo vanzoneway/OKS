@@ -31,6 +31,7 @@ public class SendEvent {
         this.packetLabel = packetLabel;
     }
 
+    // <-- в отчет изменения с HammingCodeUtil -->
     public void sendEvent() {
         try {
             if (isPortAvailable()) {
@@ -51,8 +52,6 @@ public class SendEvent {
                     }
 
                 }
-
-
             } else {
                 debug.appendText("FAILURE!!! Unavailable send data to port!" + "\n");
             }

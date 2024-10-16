@@ -5,7 +5,7 @@ public class BitStuffingUtil {
     private static final String DESTINATION_ADDRESS = "0000";
     private static final String SPACE = " ";
 
-
+    // <-- в отчет изменение с return -->
     public static String createPacket(String data,String comPortName) {
         String SOURCE_ADDRESS = toBinaryString(extractNumber(comPortName));
         return FLAG + DESTINATION_ADDRESS + SOURCE_ADDRESS + data;

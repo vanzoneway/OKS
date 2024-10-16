@@ -23,7 +23,7 @@ public class  PortReader implements SerialPortEventListener {
         this.output = output;
         this.logger = logger;
     }
-
+    // <-- в отчет изменения с HammingCodeUtil -->
     @Override
     public void serialEvent(SerialPortEvent serialPortEvent) {
         if (serialPortEvent.isRXCHAR() && serialPortEvent.getEventValue() > 0) {
