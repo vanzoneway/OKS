@@ -155,6 +155,7 @@ public class SendEvent {
             packetLabel.setMinHeight(Region.USE_PREF_SIZE);
 
         }
+
     }
 
     private boolean isPortAvailable() {

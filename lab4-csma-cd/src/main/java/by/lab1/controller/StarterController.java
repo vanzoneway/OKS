@@ -2,6 +2,7 @@ package by.lab1.controller;
 
 
 import by.lab1.creator.PortCreator;
+import by.lab1.event.PortReader;
 import by.lab1.event.SendEvent;
 import by.lab1.model.PortWithTextArea;
 import javafx.application.Platform;
@@ -87,12 +88,14 @@ public class StarterController {
                 if (currentSenderValue == null) {
                     flag = false;
                     sendQueue.clear();
+                    PortReader.dataAsStringBuilder.setLength(0);
                     return;
                 }
 
                 if (Objects.equals(previousSenderValue, currentSenderValue)) {
                     flag = false;
                     sendQueue.clear();
+                    PortReader.dataAsStringBuilder.setLength(0);
                     return;
                 } else if (Objects.equals(currentSenderValue, "-")) {
 
@@ -113,6 +116,7 @@ public class StarterController {
                     input.clear();
                     counter.setText("0");
                     flag = false;
+                    PortReader.dataAsStringBuilder.setLength(0);
                     sendQueue.clear();
                     previousSenderValue = currentSenderValue;
                     inputCounter = 0;
@@ -175,6 +179,7 @@ public class StarterController {
 
                 input.requestFocus();
                 flag = false;
+                PortReader.dataAsStringBuilder.setLength(0);
                 sendQueue.clear();
                 startCtsMonitoring();
             }
@@ -189,6 +194,7 @@ public class StarterController {
 
                 if (currentReceiverValue == null) {
                     flag = false;
+                    PortReader.dataAsStringBuilder.setLength(0);
                     sendQueue.clear();
                     return;
                 }
@@ -196,6 +202,7 @@ public class StarterController {
 
                 if (Objects.equals(previousReceiverValue, currentReceiverValue)) {
                     flag = false;
+                    PortReader.dataAsStringBuilder.setLength(0);
                     sendQueue.clear();
                     return;
                 } else if (Objects.equals(currentReceiverValue, "-")) {
@@ -209,6 +216,7 @@ public class StarterController {
                         sortComPorts(comSenderComboBox.getItems());
                         previousDeletedSenderValue = null;
                         flag = false;
+                        PortReader.dataAsStringBuilder.setLength(0);
                         sendQueue.clear();
                     });
 
@@ -261,12 +269,15 @@ public class StarterController {
                                 """, input.getParent().getParent());
 
                         flag = false;
+                        sendQueue.clear();
+                        PortReader.dataAsStringBuilder.setLength(0);
                     }
                 }
 
 
                 input.requestFocus();
                 flag = false;
+                PortReader.dataAsStringBuilder.setLength(0);
                 sendQueue.clear();
             }
 

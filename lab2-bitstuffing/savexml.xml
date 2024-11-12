@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>D:\OKS\lab3-hamming-code\target\Comports-3.jar</jar>
-  <outfile>D:\OKS\lab3-hamming-code\Comports-3.exe</outfile>
+  <jar>D:\OKS\lab4-csma-cd\Comports-4.jar</jar>
+  <outfile>D:\OKS\lab4-csma-cd\Comports-4.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>

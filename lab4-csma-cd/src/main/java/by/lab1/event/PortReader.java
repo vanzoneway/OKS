@@ -17,7 +17,7 @@ public class PortReader implements SerialPortEventListener {
     private final TextArea logger;
 
     private static final byte JAM_SIGNAL = '!';
-    private static final StringBuilder dataAsStringBuilder = new StringBuilder();
+    public static final StringBuilder dataAsStringBuilder = new StringBuilder();
 
     public PortReader(PortWithTextArea port, TextArea output, TextArea logger) {
         this.port = port;
@@ -25,7 +25,6 @@ public class PortReader implements SerialPortEventListener {
         this.logger = logger;
     }
 
-    // <-- в отчет изменения с HammingCodeUtil -->
     @Override
     public void serialEvent(SerialPortEvent serialPortEvent) {
         if (serialPortEvent.isRXCHAR() && serialPortEvent.getEventValue() > 0) {
@@ -44,8 +43,9 @@ public class PortReader implements SerialPortEventListener {
                     }
                     dataAsStringBuilder.setLength(0);
                 }
-            } catch (SerialPortException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.appendText(port.getPortName() + " lost this accepted packet ... WARNING\n");
+                dataAsStringBuilder.setLength(0);
             }
         }
     }
