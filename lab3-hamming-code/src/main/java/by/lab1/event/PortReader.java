@@ -2,7 +2,6 @@ package by.lab1.event;
 
 import by.lab1.model.PortWithTextArea;
 import by.lab1.util.BitStuffingUtil;
-import by.lab1.util.DecodedStringDto;
 import by.lab1.util.HammingCodeUtil;
 import javafx.scene.control.TextArea;
 import jssc.SerialPortEvent;
