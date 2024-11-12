@@ -23,12 +23,16 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
 public class StarterController {
+
+    private final ReentrantLock lock = new ReentrantLock();
+
 
     private PortWithTextArea writer;
     private PortWithTextArea receiver;
@@ -301,7 +305,7 @@ public class StarterController {
             }
 
             if (inputCounter == 11) {
-                SendEvent sendEvent = new SendEvent(input, logger, writer, counter, packetLabel, csmaCdLabel);
+                SendEvent sendEvent = new SendEvent(logger, writer, counter, packetLabel, csmaCdLabel, input.getText());
                 sendQueue.add(sendEvent);
                 inputCounter = 0;
                 if (sendQueue.size() == 1) {
@@ -359,7 +363,6 @@ public class StarterController {
         }
     }
 
-
     private void prepareSenderAndReceiverComboBoxes() {
         String[] portNames = SerialPortList.getPortNames();
         List<String> portNamesList = Arrays.stream(portNames)
@@ -393,7 +396,6 @@ public class StarterController {
         comReceiverComboBox.getSelectionModel().select(0);
     }
 
-
     public void sortComPorts(List<String> comPorts) {
 
         comPorts.sort((port1, port2) -> {
@@ -404,7 +406,6 @@ public class StarterController {
             return Integer.compare(num1, num2);
         });
     }
-
 
     private void closeCurrentPortIfOpenedOrNull(PortWithTextArea port) throws SerialPortException {
 

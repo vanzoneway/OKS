@@ -19,27 +19,28 @@ import java.util.Random;
 
 public class SendEvent {
 
-    private final TextArea input;
+
     private final TextArea debug;
     private final PortWithTextArea port;
     private final Label counter;
     private final Label packetLabel;
     private final Label csmaCdLabel;
+    String text;
 
     private static final double CHANNEL_BUSY_PROBABILITY = 0.7;
     private static final double COLLISION_PROBABILITY = 0.3;
     private static final byte JAM_SIGNAL = '!';
     private static final int MAX_AMOUNT_OF_ATTEMPTS = 10;
 
-    public SendEvent(TextArea input, TextArea debug,
+    public SendEvent(TextArea debug,
                      PortWithTextArea port, Label counter,
-                     Label packetLabel, Label casmaCdLabel) {
-        this.input = input;
+                     Label packetLabel, Label casmaCdLabel, String text) {
         this.debug = debug;
         this.port = port;
         this.counter = counter;
         this.packetLabel = packetLabel;
         this.csmaCdLabel = casmaCdLabel;
+        this.text = text;
     }
 
     // <-- в отчет изменения с HammingCodeUtil -->
@@ -47,7 +48,6 @@ public class SendEvent {
         try {
             if (isPortAvailable() && port.getSerialPort().isCTS()) {
 
-                String text = input.getText();
                 String dataText = text.substring(text.length() - 11);
 
                 if (dataText.length() == 11) {
