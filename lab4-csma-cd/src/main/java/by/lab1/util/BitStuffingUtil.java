@@ -53,7 +53,7 @@ public class BitStuffingUtil {
         return unstuffedData.toString();
     }
 
-    // <-- изменяем packet.length() - 4, так FCS поле для моего варианта по итогу будет занимать 4 бита -->
+
     public static String extractDataFromPacket(String packet) {
         return packet.substring(16, packet.length() - 4);
     }

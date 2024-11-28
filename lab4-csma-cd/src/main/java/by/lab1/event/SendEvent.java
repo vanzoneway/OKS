@@ -84,20 +84,19 @@ public class SendEvent {
 
                     double currentCollisionProbability = random.nextDouble();
 
+                    port.getSerialPort().writeBytes(new byte[]{b});
                     if (currentCollisionProbability < COLLISION_PROBABILITY) {
-                        port.getSerialPort().writeBytes(new byte[]{b});
                         port.getSerialPort().writeBytes(new byte[]{JAM_SIGNAL});
                         currentSendingStatus.append("!");
                         Platform.runLater(() -> csmaCdLabel.setText(currentSendingStatus.toString()));
 
-                        if(attempt == MAX_AMOUNT_OF_ATTEMPTS) continue;
+                        if(attempt == MAX_AMOUNT_OF_ATTEMPTS) break;
 
-                        // 0 ≤ r ≤ 2^k, k = min(attemptCount, 10)
+                        // 0 ≤ r ≤ 2^k, k = min(attempt, 10)
                         int delay = random.nextInt((int) Math.pow(2, Math.min(attempt, 10)) + 1);
                         Thread.sleep(delay * 100L);
                         attempt++;
                     } else {
-                        port.getSerialPort().writeBytes(new byte[]{b});
                         currentSendingStatus.append(". ");
                         sent = true;
 
@@ -147,9 +146,7 @@ public class SendEvent {
                 }
             }
 
-
             index = patternIndex + 8;
-
 
             packetLabel.setGraphic(textFlow);
             packetLabel.setMinHeight(Region.USE_PREF_SIZE);
